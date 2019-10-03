@@ -1,0 +1,64 @@
+#!/bin/bash
+echo "Введите относительный путь к каталогу в котором хотите исполнить скрипт: "
+read a
+if [$a != ""]
+then
+cd $a
+else
+echo "Переход в домашний каталог"
+fi
+echo "Введите шаблон имени для каталога, подкаталога и файлов"
+read fcn scn filen
+hmdn="$fcn"
+i=0
+while( [[ $i -lt 5 ]] )
+do
+j=0
+name1="$fcn$i"
+mkdir $name1
+cd $name1
+while( [[ $j -lt 10 ]] )
+do
+name2="$scn$j"
+mkdir $name2
+cd $name2
+k=0
+while( [[ $k -lt 20 ]] )
+do
+name3="$filen$k"
+touch $name3
+let "k = k + 1"
+done
+cd ..
+let "j = j + 1"
+done
+cd ..
+let "i = i + 1 "
+done
+
+echo "Выберите функцию:"
+echo "1 Просмотр каталога содержащего созданные каталоги в формате списка"
+echo "2 Рекурсивное удаление всех созданных каталогов и файлов"
+echo "3 Поиск одного из созданных файлов"
+echo "4 Выход"
+read doing
+while([[doing -ne 4 ]])
+case $doing in
+1)
+ls -l
+read doing
+;;
+2)
+rm hmdn0 hmdn1 hmdn2 hmdn3 hmdn4 -r
+;;
+3)
+read flname
+find ./hmnd* -name flname
+;;
+4)
+exit
+;;
+*)
+echo "Введено неправильное действие"
+;;
+esac

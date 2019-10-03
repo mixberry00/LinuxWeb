@@ -1,0 +1,37 @@
+#!/bin/bash
+echo "¬ведите относительный путь к каталогу в котором хотите исполнить скрипт: "
+read a
+if [$a != ""]
+then
+cd $a
+else
+echo "ѕереход в домашний каталог"
+fi
+echo "¬ведите шаблон имени дл€ каталога, подкаталога и файлов"
+read fcn scn filen
+hmdn="$fcn"
+i=0
+while( [[ $i -lt 5 ]] )
+do
+j=0
+name1="$fcn$i"
+mkdir $name1
+cd $name1
+while( [[ $j -lt 10 ]] )
+do
+name2="$scn$j"
+mkdir $name2
+cd $name2
+k=0
+while( [[ $k -lt 20 ]] )
+do
+name3="$filen$k"
+touch $name3
+let "k = k + 1"
+done
+cd ..
+let "j = j + 1"
+done
+cd ..
+let "i = i + 1 "
+done
