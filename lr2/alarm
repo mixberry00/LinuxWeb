@@ -1,37 +1,52 @@
 #!/bin/bash
+
+d=
+m=
+h=
+min=
+
 OPTION=$(whiptail --title  "Менеджер будильников" --menu  "Выберите опцию: " 15 60 4 \
 "1" "Добавить будильник" \
 "2" "Редактировать будильник" \
 "3" "Посмотреть список будильников" \
 "4" "Удалить будильник"  3>&1 1>&2 2>&3)
- 
+
 exitstatus=$?
 if [ $exitstatus = 0 ];
 then
      case "$OPTION" in
 		"1")
 		echo "Выбрана опция добавления будильника"
-		echo "В какой день вас разбудить(дд-мм)"
-		read d m 
-		echo "В какой час вас разбудить?"
+		echo "В какой час вас разбудить?(0-23)"
 		read h
-		declare -i min=''
-		echo "В какую минуту вас разбудить?"
+		echo "В какую минуту вас разбудить?(0-59)"
 		read min
 		echo "Введите пометку для своего будильника"
 		read com
-		echo "DISPLAY=:0
-		"$min" "$h" "$d" "$m" * /home/user/mus_alarm" | crontab -
+		echo "#$com
+		$min $h * * * DISPLAY=:0 /home/user/courses/LinuxWeb/lr2/mus_alarm.sh" | crontab -;		
 		;;
 		"2")
 		echo "Выбрана опция редактирования будильника"
 		
 		;;
 		"3")
-		echo "Выбрана опция просмотра будильника" $OPTION
+		echo "Выбрана опция просмотра будильников"
+		crontab -l >> file.txt
+		cat file.txt
+		rm file.txt
 		;;
 		"4")
-		echo "Выбрана опция удаления будильника" $OPTION
+		echo "Выбрана опция удаления будильника"
+		crontab -l >> file.txt
+		crontab -r
+		echo "Введите пометку"
+		read com
+		sed '/$com/{N
+		d
+		}' file.txt 
+		crontab file.txt
+		rm file.txt
 		;;
 	esac
 else
