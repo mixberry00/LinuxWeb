@@ -1,9 +1,9 @@
 #!/bin/bash
 
-d=
-m=
+com=
 h=
 min=
+day=
 
 OPTION=$(whiptail --title  "Менеджер будильников" --menu  "Выберите опцию: " 15 60 4 \
 "1" "Добавить будильник" \
@@ -16,37 +16,33 @@ if [ $exitstatus = 0 ];
 then
      case "$OPTION" in
 		"1")
-		echo "Выбрана опция добавления будильника"
-		echo "В какой час вас разбудить?(0-23)"
-		read h
-		echo "В какую минуту вас разбудить?(0-59)"
-		read min
-		echo "Введите пометку для своего будильника"
-		read com
-		echo "#$com
-		$min $h * * * DISPLAY=:0 /home/user/courses/LinuxWeb/lr2/mus_alarm.sh" | crontab -;		
+		day=$(whiptail --title  "Добавление будильника" --inputbox  "В какой день недели вас разбудить?(0-6)" 10 60  3>&1 1>&2 2>&3)
+		h=$(whiptail --title  "Добавление будильника" --inputbox  "В какой час вас разбудить?(0-23)" 10 60  3>&1 1>&2 2>&3)
+		min=$(whiptail --title  "Добавление будильника" --inputbox  "В какую минуту вас разбудить?(0-59)" 10 60  3>&1 1>&2 2>&3)
+		com=$(whiptail --title  "Добавление будильника" --inputbox  "Введите пометку для своего будильника" 10 60  3>&1 1>&2 2>&3)
+		(crontab -l; echo -e "#$com\n$min $h * * $day DISPLAY=:0 /home/user/courses/LinuxWeb/lr2/mus_alarm.sh") | crontab -;	
 		;;
 		"2")
-		echo "Выбрана опция редактирования будильника"
-		
+		crontab -l >> file
+		com=$(whiptail --title  "Редактирование будильника" --inputbox  "Введите пометку" 10 60  3>&1 1>&2 2>&3)
+		day=$(whiptail --title  "Редактирование будильника" --inputbox  "Введите новый день недели(0-6)" 10 60  3>&1 1>&2 2>&3)
+		h=$(whiptail --title  "Редактирование будильника" --inputbox  "Введите новый час пробуждения(0-23)" 10 60  3>&1 1>&2 2>&3)
+		min=$(whiptail --title  "Редактирование будильника" --inputbox  "Введите новую минуту пробуждения(0-59)" 10 60  3>&1 1>&2 2>&3)
+		sed -i '/#'$com'/,+1 d' file ; echo -e "#$com\n$min $h * * $day DISPLAY=:0 /home/user/courses/LinuxWeb/lr2/mus_alarm.sh" >> file
+		crontab file
+		rm file
 		;;
 		"3")
-		echo "Выбрана опция просмотра будильников"
-		crontab -l >> file.txt
-		cat file.txt
-		rm file.txt
+		crontab -l >> file
+		sed -i '/#/d' file
+		echo "Формат(мин-час-день недели(+1)):" >> file1
+		cut -f'1 2 5' -d" " --output-delimiter='-' file >> file1
+		whiptail --title  "Просмотр будильников" --textbox file1 10 60
+		rm file file1		
 		;;
 		"4")
-		echo "Выбрана опция удаления будильника"
-		crontab -l >> file.txt
-		crontab -r
-		echo "Введите пометку"
-		read com
-		sed '/$com/{N
-		d
-		}' file.txt 
-		crontab file.txt
-		rm file.txt
+		com=$(whiptail --title  "Удаление будильника" --inputbox  "Введите пометку" 10 60  3>&1 1>&2 2>&3)
+		crontab -l | sed '/#'$com'/,+1 d' | crontab -
 		;;
 	esac
 else
